@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     private Camera _mainCamera;
+    private IList<Tile> moveableTiles = new List<Tile>();
     // Start is called before the first frame update
     void Start()
     {
@@ -14,24 +16,28 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        MovePlayerUnit();
+    }
+
+    private void MovePlayerUnit()
+    {
         if (Input.GetMouseButtonUp(0))
         {
             var ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
-            if(Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.NameToLayer(Layers.TILE)))
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, ~LayerMask.NameToLayer(Layers.TILE)))
             {
                 var tile = hit.collider.GetComponent<Tile>();
-                if(tile != null)
+                if (tile != null)
                 {
                     tile.GetComponent<MeshRenderer>().material.color = Color.magenta;
-                }
-            }
 
-            if (Physics.Raycast(ray, out RaycastHit hit2))
-            {
-                Debug.Log(hit2);
+
+                    Physics.Raycast(tile.transform.position, Vector3.back, 2f, ~LayerMask.NameToLayer(Layers.TILE));
+                    Physics.Raycast(tile.transform.position, Vector3.forward, 2f, ~LayerMask.NameToLayer(Layers.TILE));
+                    Physics.Raycast(tile.transform.position, Vector3.left, 2f, ~LayerMask.NameToLayer(Layers.TILE));
+                    Physics.Raycast(tile.transform.position, Vector3.right, 2f, ~LayerMask.NameToLayer(Layers.TILE));
+                }
             }
         }
     }
-
-
 }
